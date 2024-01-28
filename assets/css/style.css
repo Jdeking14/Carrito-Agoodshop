@@ -1,0 +1,121 @@
+body{
+    font-family: 'Roboto', sans-serif;
+    color: #27272a;
+}
+
+.wrapper{
+    max-width: 1440px;
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    display: flex;
+    
+}
+
+.heading-7,
+.heading-3{
+    font-weight: 700px;
+    font-size: 22px;
+    line-height: 26px;
+}
+
+.heading-7{
+    border-bottom: 1px  solid #cccccc;
+    padding: 16px;
+    
+}
+
+.listaProductos,
+.total{    
+    padding: 16px;
+    
+}
+
+.header{
+    border-bottom: 1px  solid #cccccc;
+    padding-top: 16px;
+    padding-bottom: 16px;
+    padding-left: 3rem;
+}
+
+.header__inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;    
+}
+
+.productos{
+    display: flex;
+}
+
+
+.productos__w-tabla{
+    flex-basis: 60%;
+    padding-left: 3rem;
+}
+
+
+.productos__w-total{
+    flex-basis: 40%;
+    padding-left: 3rem;
+    padding-right: 3rem;
+}
+
+.btn {
+    border: none;    
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+  }
+
+.inp{    
+    
+    width: 50px;
+    height: 50px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #cccccc;   
+    text-align: center; 
+    
+}
+
+.raffle__w-content{
+    background-color: #e6e4e4;    
+    line-height: 26px;
+    flex-basis: 100%;            
+}
+
+.tabla{
+    width: 100%;
+    text-align: left;
+    
+}
+
+.tabla__head{
+    border-bottom: 1px  solid #cccccc;
+    height: 0px;
+    
+}
+
+.tabla__td_producto{
+    font-weight: bold;
+}
+
+.tabla__head_tr
+.tabla__rowsRef{
+    border-bottom: 1px  solid #f0f0f0;
+    height: 50px;
+}
+
+.tabla__datoRef{
+    font-size: 12px;
+}
+
+.tabla__head_tr{
+    height: 30px;
+    
+}
