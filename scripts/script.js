@@ -2,28 +2,24 @@ let carrito;
 let productos;
 let cantidad = 0;
 let valor;
-let listaProductos;
+let listaProductos = [];
 
-
+//Se inicializan los objetos y a la vez se pinta los productos justo despues de realizar la lamada a la api 
 const init = (objProduc) => {
     productos = objProduc;
-
-    //inicializar el carrito
-    //pintar los productos
     carrito = new Carrito(productos);
     pintarProducto();
-
 }
 
-
+//aqui realizo la llamada a la api. como se puede ver los valores viajan como objeto al init el cual me renderiza la tabla
 document.addEventListener("DOMContentLoaded", () => {    
     fetch("https://jsonblob.com/api/jsonBlob/1199404145575845888")
         .then((res) => res.json())
         .then(init)
 });
-
+//Esta es la funcion flecha encargada de renderizar el contenido. Dentro de esta funcion voy llamando a las funciones de dentro de la clase carrito que son las que se encargan de realizar los calculos necesarios
 const pintarProducto = () => {
-    // Crear cabecera de la tabla
+    // Se crea cabecera de la tabla
     const wrapper = document.querySelector("#w-tabla");
     const table = document.createElement('table');
     const thead = document.createElement('thead');
@@ -35,27 +31,27 @@ const pintarProducto = () => {
     table.appendChild(thead);
     table.appendChild(tbody);
 
-    // Insertar datos en la tabla
+    // se Insertan datos en la tabla
     productos.products.forEach((element, index) => {
         const idUnico = `${element.SKU}`;
         const rowProducto = document.createElement('tr');
-        rowProducto.setAttribute("name", `filaProducto-${idUnico}`);
+        rowProducto.setAttribute("tabla-producto", `filaProducto-${idUnico}`);
         
         const datoProducto = document.createElement('td');
         datoProducto.classList.add('tabla__td_producto');
         datoProducto.innerHTML = element.title;
-        datoProducto.setAttribute("name", `datoProducto-${idUnico}`);
+        datoProducto.setAttribute("titulo", `datoProducto-${idUnico}`);
 
         const datoCantidad = document.createElement('td');
-        datoCantidad.setAttribute("name", `datoCantidad-${idUnico}`);
+        datoCantidad.setAttribute("cantidad", `datoCantidad-${idUnico}`);
 
         const datoUnidad = document.createElement('td');
         datoUnidad.innerHTML = element.price + productos.currency;
-        datoUnidad.setAttribute("name", `datoUnidad-${idUnico}`);
+        datoUnidad.setAttribute("unidad", `datoUnidad-${idUnico}`);
 
         const datoTotal = document.createElement('td');
         datoTotal.setAttribute("id", `datoTotal-${idUnico}`);
-        datoTotal.setAttribute("name", `datoTotal-${idUnico}`);
+        datoTotal.setAttribute("total", `datoTotal-${idUnico}`);
 
         // Creación de botones y entrada de cantidad
         const textoCantidad = document.createElement('input');
@@ -67,13 +63,25 @@ const pintarProducto = () => {
         const botonMas = document.createElement('button');
         botonMas.classList.add('btn');
         botonMas.innerHTML = "+";
-        botonMas.addEventListener("click", () => addCantidad(idUnico));
+        botonMas.addEventListener('click', () => {
+            const producto = carrito.obtenerDatosDelProducto(idUnico);
+            carrito.addProductoAlCarrito(producto);
+            actualizarListaProductos();
+        });
         botonMas.setAttribute("id", `btnMas-${idUnico}`);
 
         const botonMenos = document.createElement('button');
         botonMenos.classList.add('btn');
         botonMenos.innerHTML = "-";
-        botonMenos.addEventListener("click", () => restarCantidad(idUnico));
+       botonMenos.addEventListener('click', (event) => {
+        const SKU = idUnico; 
+        const controlCantidad = carrito.restarProductoDelCarrito(SKU);
+        if(controlCantidad){
+            document.querySelector(`#textoCantidad-${SKU}`).value = 0;
+        }
+        actualizarListaProductos();
+    });
+    
         botonMenos.setAttribute("id", `btnMenos-${idUnico}`);
 
         datoCantidad.appendChild(botonMenos);
@@ -103,46 +111,36 @@ const pintarProducto = () => {
     });
 }
 
+//En esta funciona actulizo la lista de productos con los datos que me llegan. De esta manera actualizo dinamicamente el contenedor de la lista de productos
+function actualizarListaProductos() {
+    const container = document.getElementById('listaProductos');
+    container.innerHTML = '';
+    let totalGeneral = 0;
 
+    listaProductos.forEach(producto => {
+        const totalProducto = producto.cantidad * producto.precio;
+        totalGeneral += totalProducto;
 
+        const elementoProducto = document.createElement('div');
+        elementoProducto.innerHTML = `
+            <div>Producto: ${producto.nombre}</div>
+            <div>Cantidad: ${producto.cantidad}</div>
+            <div>Total: ${totalProducto}</div>
+        `;
+        container.appendChild(elementoProducto);
 
-const addCantidad = (idProducto) => {
-    let cantidad = parseInt(document.getElementById(`textoCantidad-${idProducto}`).value);
-    cantidad++;
-    document.getElementById(`textoCantidad-${idProducto}`).value = cantidad;
+        
+        const cantidadElement = document.querySelector(`#textoCantidad-${producto.SKU}`);
+        cantidadElement.value = producto.cantidad; // se Establece la cantidad en el elemento HTML como la cantidad del producto
+        
+    });
 
-    const productoSeleccionado = carrito.obtenerProducto(idProducto);
-    carrito.anadirProductos(productoSeleccionado);
-
-    document.getElementById(`datoTotal-${idProducto}`).innerHTML = carrito.calcularTotal(cantidad, productoSeleccionado.price);
-    
-    document.getElementById("total").innerHTML = "TOTAL: " + carrito.calcularTotalGeneral();
-    document.getElementById("listaProductos").innerHTML = document.getElementById("listaProductos").innerHTML + "<br>" + productoSeleccionado.title + " " + carrito.calcularTotal(cantidad, productoSeleccionado.price);
+    // se actualiza el total general en el DOM
+    const elementoTotalGeneral = document.getElementById('totalGeneral'); 
+    elementoTotalGeneral.textContent = `TOTAL : ${totalGeneral}`;
 }
 
-const restarCantidad = (idProducto) => {
-    let cantidad = parseInt(document.getElementById(`textoCantidad-${idProducto}`).value);
-    if (cantidad > 1) {
-        cantidad--;
-        document.getElementById(`textoCantidad-${idProducto}`).value = cantidad;
 
-        // Disminuir la cantidad del producto en el carrito
-        carrito.disminuirProducto(idProducto);
-
-        // Actualizar la cantidad y el total en el DOM
-        const productoSeleccionado = carrito.obtenerProducto(idProducto);
-        document.getElementById(`datoTotal-${idProducto}`).innerHTML = carrito.calcularTotal(cantidad, productoSeleccionado.price);
-        document.getElementById("total").innerHTML = "TOTAL: " + carrito.calcularTotalGeneral();
-        document.getElementById("listaProductos").innerHTML = document.getElementById("listaProductos").innerHTML + productoSeleccionado.title + " " + carrito.calcularTotal(cantidad, productoSeleccionado.price);
-    } else if (cantidad === 1) {
-        // Tratamiento especial cuando la cantidad es 1 y se va a eliminar del carrito
-        document.getElementById(`textoCantidad-${idProducto}`).value = 0;
-        carrito.disminuirProducto(idProducto);
-        document.getElementById(`datoTotal-${idProducto}`).innerHTML = '';
-        document.getElementById("total").innerHTML = "TOTAL: " + carrito.calcularTotalGeneral();
-        document.getElementById("listaProductos").innerHTML = "";
-    }
-}
 
 
 

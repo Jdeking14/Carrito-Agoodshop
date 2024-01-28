@@ -31,6 +31,10 @@ body{
     
 }
 
+.total{ 
+    font-weight: bold;
+}
+
 .header{
     border-bottom: 1px  solid #cccccc;
     padding-top: 16px;
